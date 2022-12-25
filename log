@@ -1,0 +1,70 @@
+Start of program.
+[21:02:29] Employee B entered room 1. waiting for 4 seconds.
+Room 1: lights ON.
+
+[21:02:29] Employee A entered room 2. waiting for 2 seconds.
+Room 2: lights ON.
+
+Violation! Employee A waited too long. (2 > 1)
+[21:02:31] Employee A exited from room 2.
+Room 2: lights OFF.
+
+[21:02:31] Employee A entered room 2. waiting for 4 seconds.
+Room 2: lights ON.
+
+Violation! Employee B waited too long. (4 > 2)
+[21:02:33] Employee B exited from room 1.
+Room 1: lights OFF.
+
+[21:02:33] Employee B entered room 1. waiting for 3 seconds.
+Room 1: lights ON.
+
+Violation! Employee A waited too long. (4 > 1)
+[21:02:35] Employee A exited from room 2.
+Room 2: lights OFF.
+
+[21:02:35] Employee A entered room 2. waiting for 1 seconds.
+Room 2: lights ON.
+
+Violation! Employee B waited too long. (3 > 2)
+[21:02:36] Employee B exited from room 1.
+Room 1: lights OFF.
+
+[21:02:36] Employee B entered room 1. waiting for 2 seconds.
+Room 1: lights ON.
+
+[21:02:36] Employee A exited from room 2.
+Room 2: lights OFF.
+
+[21:02:36] Employee C entered room 2. waiting for 2 seconds.
+Room 2: lights ON.
+
+[21:02:38] Employee B exited from room 1.
+Room 1: lights OFF.
+
+[21:02:38] Employee C exited from room 2.
+Room 2: lights OFF.
+
+[21:02:38] Employee C entered room 1. waiting for 3 seconds.
+Room 1: lights ON.
+
+[21:02:41] Employee C exited from room 1.
+Room 1: lights OFF.
+
+                ╔══════════════════════╦══════════════════════════════╦══════════════════════════════╦═════════════════════════╗
+                ║       Employee       ║               A              ║               B              ║            C            ║
+                ╠══════════════════════╬══════════════════════════════╬══════════════════════════════╬═════════════════════════╣
+                ║          ID          ║           MJOyFlxHx7         ║           ThloJt8dtf         ║        hDrx45qZbB       ║
+                ╠══════════════════════╬══════════════════════════════╬══════════════════════════════╬═════════════════════════╣
+                ║      Time Inside     ║               7              ║               9              ║            5            ║
+                ╠══════════════════════╬══════════════════════════════╬══════════════════════════════╬═════════════════════════╣
+                ║      Base Income     ║              1000            ║              1500            ║           2000          ║
+                ╠══════════════════════╬══════════════════════════════╬══════════════════════════════╬═════════════════════════╣
+                ║     Total Visits     ║             3(+ 5%)          ║             3(+ 5%)          ║          2(+ 0%)        ║
+                ╠══════════════════════╬══════════════════════════════╬══════════════════════════════╬═════════════════════════╣
+                ║   Total Violations   ║             2(-20)           ║            2(- 40)           ║         0(-  0)         ║
+                ╠══════════════════════╬══════════════════════════════╬══════════════════════════════╬═════════════════════════╣
+                ║     Total Income     ║              1029            ║              1533            ║           2000          ║
+                ╚══════════════════════╩══════════════════════════════╩══════════════════════════════╩═════════════════════════╝
+
+Process finished with exit code 0
