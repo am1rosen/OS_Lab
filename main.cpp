@@ -1,88 +1,66 @@
 #include <iostream>
-#include <pthread.h>
-#include <ctime>
 #include <unistd.h>
-#include <cstring>
 
 int random_number(int from, int to) {
     return ((rand() % (to - from)) + from);
 }
 
-char get_char(int id) {
-    if (id == 0)
-        return 'A';
-    else if (id == 1)
-        return 'B';
-    else if (id == 2)
-        return 'C';
-    return '\0';
+int a = random_number(1, 1000), b = random_number(1, 1000), c = random_number(1, 1000);
+clock_t start, end;
+double execution_time;
+
+
+int is_prime(int num) {
+    for(int i = 2; i <= num / 2; i++)
+        if(num % i == 0)
+            return 0;
+    return 1;
 }
 
-char * get_time() {
-    time_t raw_time;
-    struct tm * time_info;
-    time ( &raw_time );
-    time_info = localtime ( &raw_time );
-    char * result = asctime(time_info);
-
-    int spaces = 0, count = 0;
-    char * only_time = result;
-    for (int index = 0; index < strlen(result); index++) {
-        if (result[index] == ' ') spaces += 1;
-        if (spaces == 3) {
-            only_time[count] = result[index + 1];
-            count += 1;
-        }
-    }
-    only_time[count - 1] = '\0';
-    return only_time;
+int min(int x, int y) {
+    if (x < y)
+        return x;
+    return y;
 }
-
-int room_1 = 0, room_2 = 0;
-int time_limit[3] = {1, 2, 3};
-int income[3] = {1000, 1500, 2000};
-int violation[3] = {0, 0, 0};
-int penalty[3] = {10, 20, 30};
-int total_time[3] = {0, 0, 0};
-int times[3] = {random_number(2, 5), random_number(2, 5), random_number(2, 5)};
-pthread_mutex_t lock;
 
 void *thread_function(void *id) {
+    int *t = (int *)id;
+    int t_id = *t;
 
-    int *e_id = (int *)id;
-    int employee_id = *e_id;
 
-    for (int i = times[employee_id]; i > 0; i--) {
-        while (room_1 == 1 && room_2 == 1);
-        int free_room = 0;
-        if (!room_1) free_room = 1;
-        else if (!room_2) free_room = 2;
-        if (free_room == 1) room_1 = 1;
-        else room_2 = 1;
-
-        if (room_1 == 1 && room_2 == 1)
-            pthread_mutex_lock(&lock);
-
-        int time_inside = random_number(1, 5);
-        total_time[employee_id] += time_inside;
-        printf("[%s] Employee %c entered room %d. waiting for %d seconds.\n", get_time(), get_char(employee_id), free_room, time_inside);
-        printf("Room %d: lights ON.\n\n", free_room);
-        sleep(time_inside);
-        if (time_inside > time_limit[employee_id]) {
-            printf("Violation! Employee %c waited too long. (%d > %d)\n", get_char(employee_id), time_inside, time_limit[employee_id]);
-            income[employee_id] -= penalty[employee_id];
-            violation[employee_id] += 1;
+    if (t_id == 0) {
+        start = clock();
+        for (int i = a - 1; i > 0; i--) {
+            if (is_prime(i)) {
+                end = clock();
+                execution_time = ((double)(end - start))/CLOCKS_PER_SEC;
+                printf("[Thread] Biggest prime number smaller than a(%d) is %d. time = %fs\n", a, i, execution_time);
+                return nullptr;
+            }
         }
-        printf("[%s] Employee %c exited from room %d.\n", get_time(), get_char(employee_id), free_room);
-        printf("Room %d: lights OFF.\n\n", free_room);
+        end = clock();
+        execution_time = ((double)(end - start))/CLOCKS_PER_SEC;
+        printf("[Thread] There is no prime number smaller than a(%d). time = %fs\n", a, execution_time);
 
-
-
-        pthread_mutex_unlock(&lock);
-        if (free_room == 1)
-            room_1 = 0;
-        else
-            room_2 = 0;
+    } else if (t_id == 1) {
+        start = clock();
+        for (int i = min(b, c); i >= 1; i--) {
+            if (b % i == 0 && c % i == 0) {
+                end = clock();
+                execution_time = ((double)(end - start))/CLOCKS_PER_SEC;
+                printf("[Thread] GCD of b(%d) and c(%d) is %d. time = %fs\n", b, c, i, execution_time);
+                return nullptr;
+            }
+        }
+    } else {
+        start = clock();
+        int result = 1;
+        for (int i = 1; i <= min(b, c); i++)
+            if (b % i == 0 && c % i == 0)
+                result *= i;
+        end = clock();
+        execution_time = ((double)(end - start))/CLOCKS_PER_SEC;
+        printf("[Thread] Multiplication of all common dividers of b(%d) and c(%d) is %d. time = %fs\n", b, c, result, execution_time);
 
     }
 
@@ -90,9 +68,55 @@ void *thread_function(void *id) {
 }
 
 int main() {
-    printf("Start of program.\n");
+
+
+    // using process
+    int pid1 = fork();
+    if (pid1 == 0) {
+        start = clock();
+        for (int i = a - 1; i > 0; i--) {
+            if (is_prime(i)) {
+                end = clock();
+                execution_time = ((double)(end - start))/CLOCKS_PER_SEC;
+                printf("[Process] Biggest prime number smaller than a(%d) is %d. time = %fs\n", a, i, execution_time);
+                return 0;
+            }
+        }
+        end = clock();
+        execution_time = ((double)(end - start))/CLOCKS_PER_SEC;
+        printf("[Process] There is no prime number smaller than a(%d). time = %fs\n", a, execution_time);
+        return 0;
+    } else {
+        int pid2 = fork();
+        if (pid2 == 0) {
+            start = clock();
+            for (int i = min(b, c); i >= 1; i--) {
+                if (b % i == 0 && c % i == 0) {
+                    end = clock();
+                    execution_time = ((double)(end - start))/CLOCKS_PER_SEC;
+                    printf("[Process] GCD of b(%d) and c(%d) is %d. time = %fs\n", b, c, i, execution_time);
+                    return 0;
+                }
+            }
+
+
+        } else {
+            start = clock();
+            int result = 1;
+            for (int i = 1; i <= min(b, c); i++)
+                if (b % i == 0 && c % i == 0)
+                    result *= i;
+            end = clock();
+            execution_time = ((double)(end - start))/CLOCKS_PER_SEC;
+            printf("[Process] Multiplication of all common dividers of b(%d) and c(%d) is %d. time = %fs\n", b, c, result, execution_time);
+
+        }
+    }
+    sleep(1);
+    printf("\n\n");
+
+    //using threads
     pthread_t tid[3];
-    pthread_mutex_init(&lock, nullptr);
     int id[3];
     for (int i = 0; i < 3; i++) {
         id[i] = i;
@@ -101,25 +125,8 @@ int main() {
     for (unsigned long i : tid)
         pthread_join(i, nullptr);
 
-    income[0] += (times[0] - 2) * 5 * income[0] / 100;
-    income[1] += (times[1] - 2) * 5 * income[1] / 100;
-    income[2] += (times[2] - 2) * 5 * income[2] / 100;
 
-    printf("                ╔══════════════════════╦══════════════════════════════╦══════════════════════════════╦═════════════════════════╗\n");
-    printf("                ║       Employee       ║               A              ║               B              ║            C            ║\n");
-    printf("                ╠══════════════════════╬══════════════════════════════╬══════════════════════════════╬═════════════════════════╣\n");
-    printf("                ║          ID          ║           MJOyFlxHx7         ║           ThloJt8dtf         ║        hDrx45qZbB       ║\n");
-    printf("                ╠══════════════════════╬══════════════════════════════╬══════════════════════════════╬═════════════════════════╣\n");
-    printf("                ║      Time Inside     ║             %3d              ║             %3d              ║          %3d            ║\n", total_time[0], total_time[1], total_time[2]);
-    printf("                ╠══════════════════════╬══════════════════════════════╬══════════════════════════════╬═════════════════════════╣\n");
-    printf("                ║      Base Income     ║              1000            ║              1500            ║           2000          ║\n");
-    printf("                ╠══════════════════════╬══════════════════════════════╬══════════════════════════════╬═════════════════════════╣\n");
-    printf("                ║     Total Visits     ║             %d(+%2d%)          ║             %d(+%2d%)          ║          %d(+%2d%)        ║\n", times[0],(times[0] - 2) * 5 , times[1], (times[1] - 2) * 5, times[2], (times[2] - 2) * 5);
-    printf("                ╠══════════════════════╬══════════════════════════════╬══════════════════════════════╬═════════════════════════╣\n");
-    printf("                ║   Total Violations   ║             %d(-%2d)           ║            %d(-%3d)           ║         %d(-%3d)         ║\n", violation[0], violation[0] * 10, violation[1], violation[1] * 20, violation[2], violation[2] * 30);
-    printf("                ╠══════════════════════╬══════════════════════════════╬══════════════════════════════╬═════════════════════════╣\n");
-    printf("                ║     Total Income     ║              %4d            ║              %4d            ║           %4d          ║\n", income[0], income[1], income[2]);
-    printf("                ╚══════════════════════╩══════════════════════════════╩══════════════════════════════╩═════════════════════════╝\n");
+
 
     return 0;
 }
